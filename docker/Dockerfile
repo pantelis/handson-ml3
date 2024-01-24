@@ -6,13 +6,20 @@ RUN apt-get update && apt-get install -y \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY environment.yml /tmp/
-RUN conda env create -f /tmp/environment.yml \
-    && conda clean -afy \
-    && find /opt/conda/ -follow -type f -name '*.a' -delete \
-    && find /opt/conda/ -follow -type f -name '*.pyc' -delete \
-    && find /opt/conda/ -follow -type f -name '*.js.map' -delete \
-    && rm /tmp/environment.yml
+COPY ../environment.yml* .devcontainer/noop.txt /tmp/conda-tmp/
+RUN if [ -f "/tmp/conda-tmp/environment.yml" ]; then umask 0002 && /opt/conda/bin/conda env create -n homl3 -f /tmp/conda-tmp/environment.yml; fi \
+    && rm -rf /tmp/conda-tmp
+
+COPY docker/entrypoint.sh /tmp
+RUN chmod +x /tmp/entrypoint.sh
+
+# COPY environment.yml /tmp/
+# RUN conda env create -f /tmp/environment.yml \
+#     && conda clean -afy \
+#     && find /opt/conda/ -follow -type f -name '*.a' -delete \
+#     && find /opt/conda/ -follow -type f -name '*.pyc' -delete \
+#     && find /opt/conda/ -follow -type f -name '*.js.map' -delete \
+#     && rm /tmp/environment.yml
 
 ARG username
 ARG userid
@@ -25,7 +32,7 @@ RUN adduser ${username} --uid ${userid} --gecos '' --disabled-password \
     && chmod 0440 /etc/sudoers.d/${username}
 
 WORKDIR ${workdir}
-RUN chown ${username}:${username} ${workdir}
+RUN sudo chown -R ${username}:${username} ${workdir}
 
 USER ${username}
 WORKDIR ${workdir}
@@ -76,3 +83,7 @@ RUN cat /tmp/bashrc.bash >> ${home}/.bashrc \
 #RUN mkdir -p ${home}/.jupyter && \
 #    echo 'c.NotebookApp.password = u"sha1:c6bbcba2d04b:f969e403db876dcfbe26f47affe41909bd53392e"' \
 #    >> ${home}/.jupyter/jupyter_notebook_config.py
+
+
+
+#ENTRYPOINT ["/tmp/entrypoint.sh"]

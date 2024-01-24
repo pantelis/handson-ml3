@@ -3,12 +3,12 @@ services:
   handson-ml3:
     build:
       context: ../
-      dockerfile: ./docker/Dockerfile #Dockerfile.gpu
+      dockerfile: ./docker/Dockerfile.gpu
       args:
         - username=devel
-        - userid=1000
+        - userid=1001
     container_name: handson-ml3
-    image: ageron/handson-ml3:latest #latest-gpu
+    image: ageron/handson-ml3:latest-gpu
     restart: unless-stopped
     logging:
       driver: json-file
@@ -19,9 +19,11 @@ services:
       - "6006:6006"
     volumes:
       - ../:/home/devel/handson-ml3
-    command: /opt/conda/envs/homl3/bin/jupyter notebook --ip='0.0.0.0' --port=8888 --no-browser
-    #deploy:
-    #  resources:
-    #    reservations:
-    #      devices:
-    #      - capabilities: [gpu]
+    #command: /opt/conda/envs/homl3/bin/jupyter lab --ip='0.0.0.0' --port=8888 --no-browser
+    #command: /opt/conda/bin/conda activate homl3 && /opt/conda/envs/homl3/bin/jupyter lab --ip='0.0.0.0' --port=8888 --no-browser
+    command: bash -c "./docker/start.sh"
+    deploy:
+     resources:
+       reservations:
+         devices:
+         - capabilities: [gpu]
