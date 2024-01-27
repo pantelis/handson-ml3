@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 umask 007
-source /opt/conda/etc/profile.d/conda.sh && conda activate homl3
+source /opt/conda/etc/profile.d/conda.sh 
 
 # NOTE: the following is unsafe and only used for demo purposes
 jupyter lab --ip 0.0.0.0 --no-browser --allow-root --LabApp.token=''
